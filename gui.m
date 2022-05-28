@@ -23,7 +23,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 28-May-2022 03:07:39
+% Last Modified by GUIDE v2.5 29-May-2022 00:46:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -50,6 +50,8 @@ end
 function gui_OpeningFcn(hObject, ~, handles, varargin)
 
 global gain; 
+global FIR;
+FIR = 1;
 
 % sliers setting 
 MAX_DB = 50;
@@ -58,19 +60,15 @@ INIT_VALUE = 0;
 
 gain = zeros(1,9); % create an array with the size of this 1 row 9 column for 9 bands
 
-axes(handles.axes1); %Mengatur tag axes1
-xlabel('Time'); %memberi nama label x pada tag axes1 
-ylabel('Magnitude'); %memberi nama label y pada tag axes1
 
-axes(handles.axes2);
+
+axes(handles.input_axes);
 title('Input Signal');
-xlabel('Frequency');  
-ylabel('Magnitude'); 
+%xlabel('Frequency');  
+%ylabel('Magnitude'); 
 
-axes(handles.axes3);
-title('Output Signal');
-xlabel('Frequency');
-ylabel('Magnitude');
+axes(handles.output_axes);
+title('output Signal');
 
 set(handles.slider1,'min',MIN_DB); % max value
 set(handles.slider1,'max',MAX_DB); % min value
@@ -156,8 +154,39 @@ function open_btn_Callback(~, ~, handles)
 %	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
 % handles    structure with handles and user data (see GUIDATA)
 
-global filename;
+
 % all ys is where to store the output of the filter
+
+global Fs;
+global X; 
+global new_Fs;
+new_Fs = Fs;
+
+% open file
+[filename,pathname] = uigetfile({'*.wav'});
+
+disp(' Loading the file... ');
+
+[X,Fs] = audioread(filename);
+
+set(handles.edit0_filename_place,'string',filename); %display the file name
+set(handles.edit_newFs,'string',int2str(Fs)); %display the Fs
+
+make_filters()
+output_signal()
+disp(' *Loading is done* ');
+
+global info;
+info = audioinfo(filename)
+
+
+
+
+
+
+
+function make_filters()
+disp('make_filters is called');
 global y2; 
 global y3; 
 global y4; 
@@ -167,53 +196,99 @@ global y7;
 global y8;
 global y9;
 global y10;
-global Fs; 
-global X; 
+
 global FIR;
-global IIR;
+global X;
+global Fs;
 
-% open file
-[filename,pathname] = uigetfile({'*.wav'});
-set(handles.edit0_filename_place,'string',filename); %display the file name
+temp = Fs/2;
+if FIR == 1
+    disp('FIR starts');
+    h2 = fir1(100, 170/temp, 'low');
+    h3 = fir1(100, [171 310]/temp, 'bandpass');
+    h4 = fir1(100, [311 600]/temp, 'bandpass');
+    h5 = fir1(100, [601 1000]/temp, 'bandpass');
+    h6 = fir1(100, [1001 3000]/temp, 'bandpass');
+    h7 = fir1(100, [3001 6000]/temp, 'bandpass');
+    h8 = fir1(100, [6001 12000]/temp, 'bandpass');
+    h9 = fir1(100, [12001 14000]/temp, 'bandpass');
+    h10 = fir1(100,[14001 16000]/temp, 'bandpass');
 
-[X,Fs] = audioread(filename);
-if FIR==1
-    h3 = fir1(100, [171/Fs 310/Fs], 'bandpass');
-    h4 = fir1(100, [311/Fs 600/Fs], 'bandpass');
-    h5 = fir1(100, [601/Fs 1000/Fs], 'bandpass');
-    h6 = fir1(100, [1001/Fs 3000/Fs], 'bandpass');
-    h7 = fir1(100, [3001/Fs 6000/Fs], 'bandpass');
-    %{
-    h8 = fir1(100, [6001/Fs 12000/Fs], 'bandpass');
-    h9 = fir1(100, [12001/Fs 14000/Fs], 'bandpass');
-    h10 = fir1(100,[14001/Fs 16000/Fs], 'high');
-    %}
+    
     y2 = filter(h2, 1, X);
     y3 = filter(h3, 1, X);
     y4 = filter(h4, 1, X);
     y5 = filter(h5, 1, X);
     y6 = filter(h6, 1, X);
     y7 = filter(h7, 1, X);
-    %{
     y8 = filter(h8, 1, X);
     y9 = filter(h9, 1, X);
     y10 = filter(h10, 1, X);
-    %}
-end
-if IIR==1
-
-    %iir rn
-    [num2 , denum2] = butter(50,[0,170]/(Fs/2), 'bandpass');
+else
+    disp('IIR starts');
+    [num2 , denum2] = butter(50, 170/temp, 'low');
     y2 = filter(num2, denum2, X);
-    [num3 , denum3] = butter(50,[171,310]/(Fs/2), 'bandpass');
+    [num3 , denum3] = butter(50,[171 310]/temp, 'bandpass');
     y3 = filter(num3, denum3, X);
-    [num4 , denum4] = butter(50,[311,600]/(Fs/2), 'bandpass');
+    [num4 , denum4] = butter(50,[311 600]/temp, 'bandpass');
     y4 = filter(num4, denum4, X);
-    [num5 , denum5] = butter(50,[601,1000]/(Fs/2), 'bandpass');
+    [num5 , denum5] = butter(50,[601 1000]/temp, 'bandpass');
     y5 = filter(num5, denum5, X);
-    [num6 , denum6] = butter(50,[1001,3000]/(Fs/2), 'bandpass');
+    [num6 , denum6] = butter(50,[1001 3000]/temp, 'bandpass');
     y6 = filter(num6, denum6, X);
+    [num7 , denum7] = butter(50,[3001 6000]/temp, 'bandpass');
+    y7 = filter(num7, denum7, X);
+    [num8 , denum8] = butter(50,[6001 12000]/temp, 'bandpass');
+    y8 = filter(num8, denum8, X);
+    [num9 , denum9] = butter(50,[12001 14000]/temp, 'bandpass');
+    y9 = filter(num9, denum9, X);
+    [num10 , denum10] = butter(50,[14001 16000]/temp, 'bandpass');
+    y10 = filter(num10, denum10, X);
 end
+
+
+function output_signal()
+disp('output_signal is called');
+
+global y2; 
+global y3; 
+global y4; 
+global y5;
+global y6;
+global y7;
+global y8;
+global y9;
+global y10;
+
+global gain;
+global player;
+global X;
+global new_Fs;
+global y;
+
+for i = 1:9
+    gain(i) = 10^(gain(i)/20);
+end
+
+y = y2*gain(1) + y3*gain(2) + y4*gain(3) + y5*gain(4) + y6*gain(5) + y7*gain(6) + y8*gain(7) + y9*gain(8) + y10*gain(9); % summing filter output after multiplied by gain of each one
+
+if y == 0
+    y = X;
+end
+
+player = audioplayer(y, new_Fs);
+
+
+
+function update_Fs()
+disp('update_Fs is called');
+global player;
+global y;
+global new_Fs;
+pause(player)
+player = audioplayer(y, new_Fs);
+play(player)
+
 
 
 % --- Executes on button press in play_btn.
@@ -221,36 +296,10 @@ function play_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to play_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
-global filename;
+output_signal()
 global player;
-global y;
-global gain;
-global y2;
-global y3;
-global y4;
-global y5;
-global y6;
-global Fs;
-global FIR;
-global IIR;
 
-global X;
-for i = 1:9
-    gain(1)
-end
-y = y2*gain(1) + y3*gain(2) + y4*gain(3) + y5*gain(4) + y6*gain(5); % summing filter output after multiplied by gain of each one
-
-if y == 0
-    
-    y = X;
-end
-player = audioplayer(y,Fs);
 play(player)
-
-
-
 
 % --- Executes on button press in pause_btn.
 function pause_btn_Callback(hObject, eventdata, handles)
@@ -260,9 +309,6 @@ function pause_btn_Callback(hObject, eventdata, handles)
 global player;
 pause(player) % pause variabel player
 
-
-
-
 % --- Executes on button press in resume_btn.
 function resume_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to resume_btn (see GCBO)
@@ -271,8 +317,6 @@ function resume_btn_Callback(hObject, eventdata, handles)
 global player;
 resume(player) % resume variabel player
 
-
-
 % --- Executes on button press in stop_btn.
 function stop_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to stop_btn (see GCBO)
@@ -280,6 +324,9 @@ function stop_btn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global player;
 stop(player) % stop variabel player
+
+
+
 
 
 
@@ -294,8 +341,6 @@ global gain;
 gain(1) = get(hObject,'value');
 set(handles.edit1_box,'string',num2str(gain(1)));
 
-
-
 % --- Executes during object creation, after setting all properties.
 function slider1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider1 (see GCBO)
@@ -306,7 +351,6 @@ function slider1_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
 
 % --- Executes on slider movement.
 function slider2_Callback(hObject, eventdata, handles)
@@ -320,8 +364,6 @@ global gain;
 gain(2)=get(hObject,'value');
 set(handles.edit2_box,'string',num2str(gain(2)));
 
-
-
 % --- Executes during object creation, after setting all properties.
 function slider2_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider2 (see GCBO)
@@ -332,7 +374,6 @@ function slider2_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
 
 % --- Executes on slider movement.
 function slider3_Callback(hObject, eventdata, handles)
@@ -346,7 +387,6 @@ global gain;
 gain(3)=get(hObject,'value');
 set(handles.edit3_box,'string',num2str(gain(3)));
 
-
 % --- Executes during object creation, after setting all properties.
 function slider3_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider3 (see GCBO)
@@ -357,7 +397,6 @@ function slider3_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
 
 % --- Executes on slider movement.
 function slider4_Callback(hObject, eventdata, handles)
@@ -371,7 +410,6 @@ global gain;
 gain(4) = get(hObject,'value');
 set(handles.edit4_box,'string',num2str(gain(4))); 
 
-
 % --- Executes during object creation, after setting all properties.
 function slider4_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider4 (see GCBO)
@@ -382,7 +420,6 @@ function slider4_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
 
 % --- Executes on slider movement.
 function slider5_Callback(hObject, eventdata, handles)
@@ -396,7 +433,6 @@ global gain;
 gain(5) = get(hObject,'value');
 set(handles.edit5_box,'string',num2str(gain(5)));
 
-
 % --- Executes during object creation, after setting all properties.
 function slider5_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to slider5 (see GCBO)
@@ -407,9 +443,6 @@ function slider5_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
-
-
 
 % --- Executes on slider movement.
 function slider6_Callback(hObject, eventdata, handles)
@@ -434,8 +467,6 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
-
-
 % --- Executes on slider movement.
 function slider7_Callback(hObject, eventdata, handles)
 % hObject    handle to slider7 (see GCBO)
@@ -458,8 +489,6 @@ function slider7_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
-
 
 % --- Executes on slider movement.
 function slider8_Callback(hObject, eventdata, handles)
@@ -533,7 +562,6 @@ else
     set(handles.slider1,'value',gain(1));
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function edit1_box_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit1_box (see GCBO)
@@ -545,8 +573,6 @@ function edit1_box_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit2_box_Callback(hObject, eventdata, handles)
 % hObject    handle to edit2_box (see GCBO)
@@ -566,8 +592,6 @@ else
     set(handles.slider2,'value',gain(2));
 end
 
-
-
 % --- Executes during object creation, after setting all properties.
 function edit2_box_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit2_box (see GCBO)
@@ -579,8 +603,6 @@ function edit2_box_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit3_box_Callback(hObject, eventdata, handles)
 % hObject    handle to edit3_box (see GCBO)
@@ -600,7 +622,6 @@ else
     set(handles.slider3,'value',gain(3));
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function edit3_box_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit3_box (see GCBO)
@@ -612,8 +633,6 @@ function edit3_box_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit4_box_Callback(hObject, eventdata, handles)
 % hObject    handle to edit4_box (see GCBO)
@@ -633,7 +652,6 @@ else
     set(handles.slider4,'value',gain(4));
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function edit4_box_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit4_box (see GCBO)
@@ -645,8 +663,6 @@ function edit4_box_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit5_box_Callback(hObject, eventdata, handles)
 % hObject    handle to edit5_box (see GCBO)
@@ -666,7 +682,6 @@ else
     set(handles.slider5,'value',gain(5));
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function edit5_box_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit5_box (see GCBO)
@@ -678,8 +693,6 @@ function edit5_box_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit6_box_Callback(hObject, eventdata, handles)
 % hObject    handle to edit6_box (see GCBO)
@@ -711,8 +724,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit7_box_Callback(hObject, eventdata, handles)
 % hObject    handle to edit7_box (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -743,8 +754,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit8_box_Callback(hObject, eventdata, handles)
 % hObject    handle to edit8_box (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -774,8 +783,6 @@ function edit8_box_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit9_box_Callback(hObject, eventdata, handles)
 % hObject    handle to edit9_box (see GCBO)
@@ -809,8 +816,6 @@ end
 
 
 
-
-
 function edit0_filename_place_Callback(hObject, eventdata, handles)
 % hObject    handle to edit0_filename_place (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -818,8 +823,6 @@ function edit0_filename_place_Callback(hObject, eventdata, handles)
 global filename;
 set(hObject,'string',filename);
 % Hints: get(hObject,'String') returns contents of edit0_filename_place as text
-
-
 
 % --- Executes during object creation, after setting all properties.
 function edit0_filename_place_CreateFcn(hObject, eventdata, handles)
@@ -834,28 +837,90 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-% --- Executes on button press in plot1_btn.
-function plot1_btn_Callback(hObject, eventdata, handles)
-% hObject    handle to plot1_btn (see GCBO)
+% --- Executes on button press in plot__filters_btn.
+function plot__filters_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to plot__filters_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-%{
-global C;
-global y2;
-global y3;
-global y4;
+disp('pressed');
+global y2; 
+global y3; 
+global y4; 
 global y5;
 global y6;
+global y7;
+global y8;
+global y9;
+global y10;
+figure(1);
+subplot(4,5,1)
+plot(y2)
+subplot(4,5,2)
+plot(y3)
+subplot(4,5,3)
+plot(y2)
+subplot(4,5,4)
+plot(y2)
+subplot(4,5,5)
+plot(y2)
+subplot(4,5,6)
+plot(y2)
+subplot(4,5,7)
+plot(y2)
+subplot(4,5,8)
+plot(y2)
+subplot(4,5,9)
+plot(y2)
+subplot(4,5,10)
+plot(y2)
+subplot(4,5,11)
+plot(y2)
+subplot(4,5,12)
+plot(y2)
+subplot(4,5,13)
+plot(y2)
+subplot(4,5,14)
+plot(y2)
+subplot(4,5,15)
+plot(y2)
+subplot(4,5,16)
+plot(y2)
+subplot(4,5,17)
+plot(y2)
+subplot(4,5,18)
+plot(y2)
+
+
+
+% --- Executes on button press in input_plot_btn.
+function input_plot_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to input_plot_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global X;
+axes(handles.input_axes);
+plot(X)
+xlabel('Time')
+ylabel('Audio Signal')
+
+
+
+
+% --- Executes on button press in output_plot_btn.
+function output_plot_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to output_plot_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 global y;
+axes(handles.output_axes);
+plot(y)
+xlabel('Time')
+ylabel('Audio Signal')
 
-y = y2*C(1)+y3*C(2)+y4*C(3)+y5*C(4)+y6*C(5);
 
-axes(handles.axes1);
-plot(y);
-xlabel('Time');
-ylabel('Magnitude');
-%}
+
+
+
 
 
 
@@ -868,7 +933,7 @@ function gui_window_SizeChangedFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
+%{
 % --- Executes on selection change in listbox2.
 function listbox2_Callback(hObject, eventdata, handles)
 % hObject    handle to listbox2 (see GCBO)
@@ -890,7 +955,7 @@ function listbox2_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
+%}
 
 
 % --- Executes when user attempts to close gui_window.
@@ -902,32 +967,25 @@ function gui_window_CloseRequestFcn(hObject, eventdata, handles)
 % Hint: delete(hObject) closes the figure
 delete(hObject);
 
-
-
 % --- Executes during object creation, after setting all properties.
-function axes2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to axes2 (see GCBO)
+function input_axes_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to input_axes (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-
-% Hint: place code in OpeningFcn to populate axes2
-
+% Hint: place code in OpeningFcn to populate input_axes
 
 % --- Executes during object creation, after setting all properties.
-function axes3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to axes3 (see GCBO)
+function output_axes_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to output_axes (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-
-% Hint: place code in OpeningFcn to populate axes3
-
+% Hint: place code in OpeningFcn to populate output_axes
 
 % --- Executes during object creation, after setting all properties.
 function open_btn_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to open_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-
 
 % --- Executes on key press with focus on open_btn and none of its controls.
 function open_btn_KeyPressFcn(hObject, eventdata, handles)
@@ -944,30 +1002,87 @@ function play_btn_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-
-% --- Executes on button press in radiobutton3.
-function radiobutton3_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton3 (see GCBO)
+function edit_newFs_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_newFs (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global FIR; 
-FIR = get(hObject,'Value');
 
-% Hint: get(hObject,'Value') returns toggle state of radiobutton3
+% Hints: get(hObject,'String') returns contents of edit_newFs as text
+%        str2double(get(hObject,'String')) returns contents of edit_newFs as a double
+global new_Fs;
+new_Fs = str2num(get(hObject,'string'));
+update_Fs()
+
+% --- Executes during object creation, after setting all properties.
+function edit_newFs_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_newFs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
 
 
-% --- Executes on button press in radiobutton4.
-function radiobutton4_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton4 (see GCBO)
+% --- Executes on button press in fir_btn.
+function fir_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to fir_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global IIR ;
-IIR = get(hOBject,'Value');
-% Hint: get(hObject,'Value') returns toggle state of radiobutton4
+% Hint: get(hObject,'Value') returns toggle state of fir_btn
+
+
+% --- Executes on button press in iir_btn.
+function iir_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to iir_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% Hint: get(hObject,'Value') returns toggle state of iir_btn
 
 
 % --- Executes during object creation, after setting all properties.
-function radiobutton3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to radiobutton3 (see GCBO)
+function fir_btn_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fir_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+% --- Executes during object creation, after setting all properties.
+function iir_btn_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to iir_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% --- Executes when selected object is changed in filter_type_grp.
+function filter_type_grp_SelectionChangedFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in filter_type_grp 
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global FIR;
+
+
+selected = get(handles.filter_type_grp,'SelectedObject');
+
+if strcmp(selected.String, 'FIR') == 1
+    FIR = 1;
+else
+    FIR = 0;
+end
+make_filters()
+output_signal()
+
+    
+
+
+
+
+
+% --- Executes on button press in save_btn.
+function save_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to save_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global y;
+global new_Fs;
+audiowrite('output.wav',y,new_Fs);
