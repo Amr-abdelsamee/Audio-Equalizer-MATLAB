@@ -1,3 +1,10 @@
+% TO DO
+% 1- plot the filtes mag, phase, impulse, step response in time and freq
+% 2- plot input/output like 1
+% 3- order for FIR IIR filters
+% 4- gain -> db to mag
+
+
 % DO NOT EDIT
 function varargout = gui(varargin)
 % GUI MATLAB code for gui.fig
@@ -23,7 +30,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 29-May-2022 00:46:20
+% Last Modified by GUIDE v2.5 30-May-2022 04:13:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,13 +59,14 @@ function gui_OpeningFcn(hObject, ~, handles, varargin)
 global gain; 
 global FIR;
 FIR = 1;
+gain = zeros(1,9); % create an array with the size of this 1 row 9 column for 9 bands
 
 % sliers setting 
 MAX_DB = 50;
 MIN_DB = -50;
 INIT_VALUE = 0;
 
-gain = zeros(1,9); % create an array with the size of this 1 row 9 column for 9 bands
+
 
 
 
@@ -204,6 +212,7 @@ global Fs;
 temp = Fs/2;
 if FIR == 1
     disp('FIR starts');
+    
     h2 = fir1(100, 170/temp, 'low');
     h3 = fir1(100, [171 310]/temp, 'bandpass');
     h4 = fir1(100, [311 600]/temp, 'bandpass');
@@ -213,7 +222,7 @@ if FIR == 1
     h8 = fir1(100, [6001 12000]/temp, 'bandpass');
     h9 = fir1(100, [12001 14000]/temp, 'bandpass');
     h10 = fir1(100,[14001 16000]/temp, 'bandpass');
-
+    
     
     y2 = filter(h2, 1, X);
     y3 = filter(h3, 1, X);
@@ -224,27 +233,40 @@ if FIR == 1
     y8 = filter(h8, 1, X);
     y9 = filter(h9, 1, X);
     y10 = filter(h10, 1, X);
+    
 else
+    
     disp('IIR starts');
-    [num2 , denum2] = butter(50, 170/temp, 'low');
-    y2 = filter(num2, denum2, X);
-    [num3 , denum3] = butter(50,[171 310]/temp, 'bandpass');
-    y3 = filter(num3, denum3, X);
-    [num4 , denum4] = butter(50,[311 600]/temp, 'bandpass');
-    y4 = filter(num4, denum4, X);
-    [num5 , denum5] = butter(50,[601 1000]/temp, 'bandpass');
-    y5 = filter(num5, denum5, X);
-    [num6 , denum6] = butter(50,[1001 3000]/temp, 'bandpass');
-    y6 = filter(num6, denum6, X);
-    [num7 , denum7] = butter(50,[3001 6000]/temp, 'bandpass');
-    y7 = filter(num7, denum7, X);
-    [num8 , denum8] = butter(50,[6001 12000]/temp, 'bandpass');
-    y8 = filter(num8, denum8, X);
-    [num9 , denum9] = butter(50,[12001 14000]/temp, 'bandpass');
-    y9 = filter(num9, denum9, X);
-    [num10 , denum10] = butter(50,[14001 16000]/temp, 'bandpass');
-    y10 = filter(num10, denum10, X);
+    [z,p,k] = butter(50, 170/temp, 'low');
+    [sos,g] = zp2sos(z,p,k);
+    y2 = filtfilt(sos,g,X);
+    [z,p,k] = butter(50,[171 310]/temp, 'bandpass');
+    [sos,g] = zp2sos(z,p,k);
+    y3 = filtfilt(sos,g,X);
+    [z,p,k] = butter(50,[311 600]/temp, 'bandpass');
+    [sos,g] = zp2sos(z,p,k);
+    y4 = filtfilt(sos,g,X);
+    [z,p,k] = butter(50,[601 1000]/temp, 'bandpass');
+    [sos,g] = zp2sos(z,p,k);
+    y5 = filtfilt(sos,g,X);
+    [z,p,k] = butter(50,[1001 3000]/temp, 'bandpass');
+    [sos,g] = zp2sos(z,p,k);
+    y6 = filtfilt(sos,g,X);
+    [z,p,k] = butter(50,[3001 6000]/temp, 'bandpass');
+    [sos,g] = zp2sos(z,p,k);
+    y7 = filtfilt(sos,g,X);
+    [z,p,k] = butter(50,[6001 12000]/temp, 'bandpass');
+    [sos,g] = zp2sos(z,p,k);
+    y8 = filtfilt(sos,g,X);
+    [z,p,k] = butter(50,[12001 14000]/temp, 'bandpass');
+    [sos,g] = zp2sos(z,p,k);
+    y9 = filtfilt(sos,g,X);
+    [z,p,k] = butter(50,[14001 16000]/temp, 'bandpass');
+    [sos,g] = zp2sos(z,p,k);
+    y10 = filtfilt(sos,g,X);
+
 end
+disp('make_filters is done');
 
 
 function output_signal()
@@ -277,6 +299,7 @@ if y == 0
 end
 
 player = audioplayer(y, new_Fs);
+disp('output_signal is done');
 
 
 
@@ -288,6 +311,7 @@ global new_Fs;
 pause(player)
 player = audioplayer(y, new_Fs);
 play(player)
+disp('update_Fs is done');
 
 
 
@@ -296,6 +320,7 @@ function play_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to play_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+disp('play button is pressed');
 output_signal()
 global player;
 
@@ -837,59 +862,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in plot__filters_btn.
-function plot__filters_btn_Callback(hObject, eventdata, handles)
-% hObject    handle to plot__filters_btn (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-disp('pressed');
-global y2; 
-global y3; 
-global y4; 
-global y5;
-global y6;
-global y7;
-global y8;
-global y9;
-global y10;
-figure(1);
-subplot(4,5,1)
-plot(y2)
-subplot(4,5,2)
-plot(y3)
-subplot(4,5,3)
-plot(y2)
-subplot(4,5,4)
-plot(y2)
-subplot(4,5,5)
-plot(y2)
-subplot(4,5,6)
-plot(y2)
-subplot(4,5,7)
-plot(y2)
-subplot(4,5,8)
-plot(y2)
-subplot(4,5,9)
-plot(y2)
-subplot(4,5,10)
-plot(y2)
-subplot(4,5,11)
-plot(y2)
-subplot(4,5,12)
-plot(y2)
-subplot(4,5,13)
-plot(y2)
-subplot(4,5,14)
-plot(y2)
-subplot(4,5,15)
-plot(y2)
-subplot(4,5,16)
-plot(y2)
-subplot(4,5,17)
-plot(y2)
-subplot(4,5,18)
-plot(y2)
-
 
 
 % --- Executes on button press in input_plot_btn.
@@ -1012,6 +984,7 @@ function edit_newFs_Callback(hObject, eventdata, handles)
 global new_Fs;
 new_Fs = str2num(get(hObject,'string'));
 update_Fs()
+output_signal()
 
 % --- Executes during object creation, after setting all properties.
 function edit_newFs_CreateFcn(hObject, eventdata, handles)
@@ -1074,10 +1047,6 @@ output_signal()
 
     
 
-
-
-
-
 % --- Executes on button press in save_btn.
 function save_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to save_btn (see GCBO)
@@ -1086,3 +1055,112 @@ function save_btn_Callback(hObject, eventdata, handles)
 global y;
 global new_Fs;
 audiowrite('output.wav',y,new_Fs);
+%mp3write(y,new_Fs,'output.mp3');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% --- Executes on button press in plot1_filters_btn.
+function plot1_filters_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to plot1_filters_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global y2; 
+global y3;
+global y4; 
+global y5;
+global y6;
+global y7;
+global y8;
+global y9;
+global y10;
+figure(1);
+subplot(4,5,1)
+plot(y2)
+subplot(4,5,2)
+plot(y3)
+subplot(4,5,3)
+plot(y2)
+subplot(4,5,4)
+plot(y2)
+subplot(4,5,5)
+plot(y2)
+subplot(4,5,6)
+plot(y2)
+subplot(4,5,7)
+plot(y2)
+subplot(4,5,8)
+plot(y2)
+subplot(4,5,9)
+plot(y2)
+subplot(4,5,10)
+plot(y2)
+subplot(4,5,11)
+plot(y2)
+subplot(4,5,12)
+plot(y2)
+subplot(4,5,13)
+plot(y2)
+subplot(4,5,14)
+plot(y2)
+subplot(4,5,15)
+plot(y2)
+subplot(4,5,16)
+plot(y2)
+subplot(4,5,17)
+plot(y2)
+subplot(4,5,18)
+plot(y2)
+
+
+
+% --- Executes on button press in plot2_filters_btn.
+function plot2_filters_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to plot2_filters_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+% --- Executes on button press in plot3_filters_btn.
+function plot3_filters_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to plot3_filters_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+% --- Executes on button press in plot4_filters_btn.
+function plot4_filters_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to plot4_filters_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
