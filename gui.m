@@ -225,45 +225,163 @@ if FIR == 1
     
     
     y2 = filter(h2, 1, X);
+    figure(101);
+    [z,p,k] = tf2zpk(h2,1);
+    subplot(3,3,1);
+    pzmap(tf(h2,1));
+    title('PZ FIR 0-170'); 
+    disp('0-170') ;k
+    
     y3 = filter(h3, 1, X);
+    [z,p,k] = tf2zpk(h3,1);
+    subplot(3,3,2);
+    pzmap(tf(h3,1));
+    title('PZ FIR 170-310'); 
+    disp('170-310') ;k
+    
     y4 = filter(h4, 1, X);
+    [z,p,k] = tf2zpk(h4,1);
+    subplot(3,3,3);
+    pzmap(tf(h4,1));
+    title('PZ FIR 310-600'); 
+    disp('310-600') ;k
+    
     y5 = filter(h5, 1, X);
+    [z,p,k] = tf2zpk(h5,1);
+    subplot(3,3,4);
+    pzmap(tf(h5,1));
+    title('PZ FIR 600-1K'); 
+    disp('600-1K') ;k
+    
     y6 = filter(h6, 1, X);
+    [z,p,k] = tf2zpk(h6,1);
+    subplot(3,3,5);
+    pzmap(tf(h6,1));
+    title('PZ FIR 1K-3K'); 
+    disp('1K-3K') ;k
+    
     y7 = filter(h7, 1, X);
+    [z,p,k] = tf2zpk(h7,1);
+    subplot(3,3,6);
+    pzmap(tf(h7,1));
+    title('PZ FIR 3K-6K'); 
+    disp('3K-6K') ;k
+    
     y8 = filter(h8, 1, X);
+    [z,p,k] = tf2zpk(h8,1);
+    subplot(3,3,7);
+    pzmap(tf(h8,1));
+    title('PZ FIR 6K-12K'); 
+    disp('6K-12K') ; k
+    
     y9 = filter(h9, 1, X);
+    [z,p,k] = tf2zpk(h9,1);
+    subplot(3,3,8);
+    pzmap(tf(h9,1));
+    title('PZ FIR 12K-14K');
+    disp('12K-14K') ; k
+    
     y10 = filter(h10, 1, X);
+    [z,p,k] = tf2zpk(h10,1);
+    subplot(3,3,9);
+    pzmap(tf(h10,1));
+    title('PZ FIR 14K-16K');
+    disp('14K-16K'); k
     
 else
     
     disp('IIR starts');
-    [z,p,k] = butter(50, 170/temp, 'low');
+    Wp= 170/temp; Ws=220/temp;
+    [n,Wn]= buttord(Wp,Ws,4,8);
+    [z,p,k] = butter(n,Wn, 'low');
     [sos,g] = zp2sos(z,p,k);
     y2 = filtfilt(sos,g,X);
-    [z,p,k] = butter(50,[171 310]/temp, 'bandpass');
+    disp('0-170: ');
+    figure(102);
+    subplot(3,3,1); 
+    zplane(z,p); title('PZ IIR 0-170');
+    k
+
+    
+    Wp= [171 300]/temp; Ws=[121 350]/temp;
+    [n,Wn]= buttord(Wp,Ws,4,8);
+    [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y3 = filtfilt(sos,g,X);
-    [z,p,k] = butter(50,[311 600]/temp, 'bandpass');
+    disp('170-310: ');
+    subplot(3,3,2);
+    zplane(z,p); title('PZ IIR 170-310');
+    k
+    
+    Wp= [311 600]/temp; Ws=[261 650]/temp;
+    [n,Wn]= buttord(Wp,Ws,4,8);
+    [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y4 = filtfilt(sos,g,X);
-    [z,p,k] = butter(50,[601 1000]/temp, 'bandpass');
+    disp('310-600: ');
+    subplot(3,3,3);
+    zplane(z,p); title('PZ IIR 310-600');
+    k
+    
+    Wp= [601 1000]/temp; Ws=[551 1050]/temp;
+    [n,Wn]= buttord(Wp,Ws,4,8);
+    [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y5 = filtfilt(sos,g,X);
-    [z,p,k] = butter(50,[1001 3000]/temp, 'bandpass');
+    disp('600-1K: ');
+    subplot(3,3,4);
+    zplane(z,p); title('PZ IIR 600-1K');
+    k
+    
+    Wp= [1001 3000]/temp; Ws=[951 3050]/temp;
+    [n,Wn]= buttord(Wp,Ws,4,8);
+    [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y6 = filtfilt(sos,g,X);
-    [z,p,k] = butter(50,[3001 6000]/temp, 'bandpass');
+    disp('1K-3K: ');
+    subplot(3,3,5);
+    zplane(z,p); title('PZ IIR 1K-3K');
+    k
+    
+    Wp= [3001 6000]/temp; Ws=[2951 6050]/temp;
+    [n,Wn]= buttord(Wp,Ws,4,8);
+    [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y7 = filtfilt(sos,g,X);
-    [z,p,k] = butter(50,[6001 12000]/temp, 'bandpass');
+    disp('3K-6K: ');
+    subplot(3,3,6);
+    zplane(z,p); title('PZ IIR 3K-6K');
+    k
+    
+    Wp= [6001 12000]/temp; Ws=[5950 12050]/temp;
+    [n,Wn]= buttord(Wp,Ws,4,8);
+    [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y8 = filtfilt(sos,g,X);
-    [z,p,k] = butter(50,[12001 14000]/temp, 'bandpass');
+    disp('6K-12K:');
+    subplot(3,3,7);
+    zplane(z,p); title ('PZ IIR 6K-12K');
+    k
+    
+    Wp= [12001 14000]/temp; Ws=[11950 14050]/temp;
+    [n,Wn]= buttord(Wp,Ws,4,8);
+    [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y9 = filtfilt(sos,g,X);
-    [z,p,k] = butter(50,[14001 16000]/temp, 'bandpass');
+    disp('12K-14K:');
+    subplot(3,3,8);
+    zplane(z,p); title ('PZ IIR 12K-14K');
+    k
+    
+    Wp= [14001 16000]/temp; Ws=[13950 16050]/temp;
+    [n,Wn]= buttord(Wp,Ws,4,8);
+    [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y10 = filtfilt(sos,g,X);
+    disp('14K-16K:');
+    subplot(3,3,9);
+    zplane(z,p); title ('PZ IIR 14k-16K');
+    k
 
 end
 disp('make_filters is done');
@@ -1161,6 +1279,9 @@ function plot4_filters_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to plot4_filters_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global y2;    
+
+
 
 
 
