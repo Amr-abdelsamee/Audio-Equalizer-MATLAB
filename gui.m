@@ -1,9 +1,3 @@
-% TO DO
-% 1- plot the filtes mag, phase, impulse, step response in time and freq
-% 2- plot input/output like 1
-% 3- order for FIR IIR filters
-% 4- gain -> db to mag
-
 
 % DO NOT EDIT
 function varargout = gui(varargin)
@@ -30,7 +24,7 @@ function varargout = gui(varargin)
 
 % Edit the above text to modify the response to help gui
 
-% Last Modified by GUIDE v2.5 30-May-2022 04:13:51
+% Last Modified by GUIDE v2.5 31-May-2022 04:51:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -51,8 +45,6 @@ else
 end
 % End initialization code
 
-
-
 % --- Executes just before gui is made visible.
 function gui_OpeningFcn(hObject, ~, handles, varargin)
 
@@ -66,17 +58,15 @@ MAX_DB = 50;
 MIN_DB = -50;
 INIT_VALUE = 0;
 
-
-
-
-
 axes(handles.input_axes);
 title('Input Signal');
-%xlabel('Frequency');  
-%ylabel('Magnitude'); 
+xlabel('Time')
+ylabel('Audio Signal')
 
 axes(handles.output_axes);
 title('output Signal');
+xlabel('Time')
+ylabel('Audio Signal')
 
 set(handles.slider1,'min',MIN_DB); % max value
 set(handles.slider1,'max',MAX_DB); % min value
@@ -141,7 +131,6 @@ guidata(hObject, handles);
 % UIWAIT makes gui wait for user response (see UIRESUME)
 % uiwait(handles.gui_window);
 
-
 % --- Outputs from this function are returned to the command line.
 function varargout = gui_OutputFcn(~, ~, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
@@ -151,7 +140,6 @@ function varargout = gui_OutputFcn(~, ~, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
-
 
 % --- Executes on key press with focus on open_btn and none of its controls.
 function open_btn_Callback(~, ~, handles)
@@ -189,11 +177,8 @@ info = audioinfo(filename)
 
 
 
-
-
-
-
 function make_filters()
+% make_filters 
 disp('make_filters is called');
 global y2; 
 global y3; 
@@ -211,177 +196,556 @@ global Fs;
 
 temp = Fs/2;
 if FIR == 1
+    
     disp('FIR starts');
     
+    %----------------------------------------------------------------------
     h2 = fir1(100, 170/temp, 'low');
-    h3 = fir1(100, [171 310]/temp, 'bandpass');
-    h4 = fir1(100, [311 600]/temp, 'bandpass');
-    h5 = fir1(100, [601 1000]/temp, 'bandpass');
-    h6 = fir1(100, [1001 3000]/temp, 'bandpass');
-    h7 = fir1(100, [3001 6000]/temp, 'bandpass');
-    h8 = fir1(100, [6001 12000]/temp, 'bandpass');
-    h9 = fir1(100, [12001 14000]/temp, 'bandpass');
-    h10 = fir1(100,[14001 16000]/temp, 'bandpass');
+    % phases of digital filter
+    figure(98);
+    set(figure(98), 'name', 'Phase of FIR filter')
+    subplot(3,3,1);
+    phasez(h2,1);
+    title('Phase 0-170');
+    % Impulse response of digital filter
+    figure(99)
+    set(figure(99), 'name', 'Impulse response of FIR filter')
+    subplot(3,3,1);
+    impz(h2)
+    title('0-170 HZ');
+    % Step response of digital filter
+    figure(100)
+    set(figure(100), 'name', 'Step response of FIR filter')
+    subplot(3,3,1);
+    stepz(h2)
+    title('0-170 HZ'); 
     
+    %----------------------------------------------------------------------
+    h3 = fir1(100, [170 310]/temp, 'bandpass');
+    % phases of digital filter
+    figure(98);
+    subplot(3,3,2); 
+    phasez(h3,1); 
+    title('Phase 170-310');
+    % Impulse response of digital filter
+    figure(99)
+    subplot(3,3,2);
+    impz(h3)
+    title('170-310 HZ');
+    % Step response of digital filter
+    figure(100)
+    subplot(3,3,2);
+    stepz(h3)
+    title('170-310 HZ');
+    
+    %----------------------------------------------------------------------
+    h4 = fir1(100, [310 600]/temp, 'bandpass');
+    % phases of digital filter
+    figure(98);
+    subplot(3,3,3);
+    phasez(h4,1);
+    title('Phase 310-600');
+    % Impulse response of digital filter
+    figure(99)
+    subplot(3,3,3);
+    impz(h4)
+    title('310-600 HZ');
+    % Step response of digital filter
+    figure(100)
+    subplot(3,3,3);
+    stepz(h4)
+    title('310-600 HZ');
+    
+    %----------------------------------------------------------------------
+    h5 = fir1(100, [600 1000]/temp, 'bandpass');
+    % phases of digital filter
+    figure(98);
+    subplot(3,3,4); 
+    phasez(h5,1); 
+    title('Phase 600-1000');
+    % Impulse response of digital filter
+    figure(99)
+    subplot(3,3,4);
+    impz(h5)
+    title('600-1k HZ');
+    % Step response of digital filter
+    figure(100)
+    subplot(3,3,4);
+    stepz(h5)
+    title('600-1k HZ');
+    
+    %----------------------------------------------------------------------
+    h6 = fir1(100, [1000 3000]/temp, 'bandpass');
+    % phases of digital filter
+    figure(98);
+    subplot(3,3,5); 
+    phasez(h6,1); 
+    title('Phase 1000-3000');
+    % Impulse response of digital filter
+    figure(99)
+    subplot(3,3,5);
+    impz(h6)
+    title('1k-3k HZ');
+    % Step response of digital filter
+    figure(100)
+    subplot(3,3,5);
+    stepz(h6)
+    title('1k-3k HZ');
+    
+    %----------------------------------------------------------------------
+    h7 = fir1(100, [3000 6000]/temp, 'bandpass');
+    % phases of digital filter
+    figure(98);
+    subplot(3,3,6);
+    phasez(h7,1); 
+    title('Phase 3000-6000');
+    % Impulse response of digital filter
+    figure(99);
+    subplot(3,3,6);
+    impz(h7)
+    title('3k-6k HZ');
+    % Step response of digital filter
+    figure(100)
+    subplot(3,3,6);
+    stepz(h7)
+    title('3k-6k HZ');
+    
+    %----------------------------------------------------------------------
+    h8 = fir1(100, [6000 12000]/temp, 'bandpass');
+    % phases of digital filter
+    figure(98);
+    subplot(3,3,7); 
+    phasez(h8,1); 
+    title('Phase 6000-12000');
+    % Impulse response of digital filter
+    figure(99)
+    subplot(3,3,7);
+    impz(h8)
+    title('6k-12k HZ');
+    % Step response of digital filter
+    figure(100)
+    subplot(3,3,7);
+    stepz(h8)
+    title('6k-12k HZ');
+    
+    %----------------------------------------------------------------------
+    h9 = fir1(100, [12000 14000]/temp, 'bandpass');
+    % phases of digital filter
+    figure(98);
+    subplot(3,3,8);
+    phasez(h9,1);
+    title('Phase 12000-14000');
+    % Impulse response of digital filter
+    figure(99)
+    subplot(3,3,8);
+    impz(h9)
+    title('12k-14k HZ');
+    % Step response of digital filter
+    figure(100)
+    subplot(3,3,8);
+    stepz(h9)
+    title('12k-14k HZ');
+    
+    %----------------------------------------------------------------------
+    h10 = fir1(100,[14000 16000]/temp, 'bandpass');
+    % phases of digital filter
+    figure(98);
+    subplot(3,3,9);
+    phasez(h10,1);
+    title('Phase 14000-16000');
+    % Impulse response of digital filter
+    figure(99)
+    subplot(3,3,9);
+    impz(h10)
+    title('14k-16k HZ');
+    % Step response of digital filter
+    figure(100)
+    subplot(3,3,9);
+    stepz(h10)
+    title('14k-16k HZ');
+    
+    %----------------------------------------------------------------------
+    %----------------------------------------------------------------------
     
     y2 = filter(h2, 1, X);
-    figure(101);
     [z,p,k] = tf2zpk(h2,1);
+    % zeros and poles plot
+    figure(101)
+    set(figure(101), 'name', 'Zeros and Poles of FIR')
     subplot(3,3,1);
     pzmap(tf(h2,1));
-    title('PZ FIR 0-170'); 
-    disp('0-170') ;k
+    title('0-170 Hz');
+    %gain
+    disp('0-170') ;
+    k
+    %----------------------------------------------------------------------
     
     y3 = filter(h3, 1, X);
     [z,p,k] = tf2zpk(h3,1);
+    % zeros and poles plot
+    figure(101)
     subplot(3,3,2);
     pzmap(tf(h3,1));
-    title('PZ FIR 170-310'); 
-    disp('170-310') ;k
+    figure(101);
+    title('170-310 Hz'); 
+    %gain
+    disp('170-310') ;
+    k
+    %----------------------------------------------------------------------
     
     y4 = filter(h4, 1, X);
     [z,p,k] = tf2zpk(h4,1);
+    % zeros and poles plot
+    figure(101)
     subplot(3,3,3);
     pzmap(tf(h4,1));
-    title('PZ FIR 310-600'); 
-    disp('310-600') ;k
+    title('310-600 Hz');
+    %gain
+    disp('310-600') ;
+    k
+    %----------------------------------------------------------------------
     
     y5 = filter(h5, 1, X);
     [z,p,k] = tf2zpk(h5,1);
+    % zeros and poles plot
+    figure(101)
     subplot(3,3,4);
     pzmap(tf(h5,1));
-    title('PZ FIR 600-1K'); 
-    disp('600-1K') ;k
+    title('600-1K Hz');
+    %gain
+    disp('600-1K') ;
+    k
+    %----------------------------------------------------------------------
     
     y6 = filter(h6, 1, X);
     [z,p,k] = tf2zpk(h6,1);
+    % zeros and poles plot
+    figure(101)
     subplot(3,3,5);
     pzmap(tf(h6,1));
-    title('PZ FIR 1K-3K'); 
-    disp('1K-3K') ;k
+    title('1K-3K Hz');
+    %gain
+    disp('1K-3K') ;
+    k
+    %----------------------------------------------------------------------
     
     y7 = filter(h7, 1, X);
     [z,p,k] = tf2zpk(h7,1);
+    % zeros and poles plot
+    figure(101)
     subplot(3,3,6);
     pzmap(tf(h7,1));
-    title('PZ FIR 3K-6K'); 
-    disp('3K-6K') ;k
+    title('3K-6K Hz');
+    %gain
+    disp('3K-6K') ;
+    k
+    %----------------------------------------------------------------------
     
     y8 = filter(h8, 1, X);
     [z,p,k] = tf2zpk(h8,1);
+    % zeros and poles plot
+    figure(101)
     subplot(3,3,7);
     pzmap(tf(h8,1));
-    title('PZ FIR 6K-12K'); 
-    disp('6K-12K') ; k
+    title('6K-12K Hz'); 
+    %gain
+    disp('6K-12K') ; 
+    k
+    %----------------------------------------------------------------------
     
     y9 = filter(h9, 1, X);
     [z,p,k] = tf2zpk(h9,1);
+    % zeros and poles plot
+    figure(101)
     subplot(3,3,8);
     pzmap(tf(h9,1));
-    title('PZ FIR 12K-14K');
-    disp('12K-14K') ; k
+    title('12K-14K Hz');
+    %gain
+    disp('12K-14K') ; 
+    k
+    %----------------------------------------------------------------------
     
     y10 = filter(h10, 1, X);
     [z,p,k] = tf2zpk(h10,1);
+    % zeros and poles plot
+    figure(101)
     subplot(3,3,9);
     pzmap(tf(h10,1));
-    title('PZ FIR 14K-16K');
-    disp('14K-16K'); k
+    title('14K-16K Hz');
+    %gain
+    disp('14K-16K'); 
+    k
+    %----------------------------------------------------------------------
     
 else
     
     disp('IIR starts');
+    %----------------------------------------------------------------------
+    
     Wp= 170/temp; Ws=220/temp;
     [n,Wn]= buttord(Wp,Ws,4,8);
     [z,p,k] = butter(n,Wn, 'low');
     [sos,g] = zp2sos(z,p,k);
     y2 = filtfilt(sos,g,X);
-    disp('0-170: ');
+    % poles and zeros of IIR
     figure(102);
+    set(figure(102), 'name', 'Zeros and Poles of IIR filter')
     subplot(3,3,1); 
-    zplane(z,p); title('PZ IIR 0-170');
+    zplane(z,p); title('0-170 Hz');
+    % phase of IIR filter
+    figure(202);
+    set(figure(202),'name','Phase of IIR filter ');
+    subplot(3,3,1);phasez(sos,512)
+    title('0-170Hz');
+    % Impulse response of digital filter
+    figure(203)
+    set(figure(203), 'name', 'Impulse response of IIR filter')
+    subplot(3,3,1);
+    [himp,timp] = impz(sos); himp = himp*g; stem(timp,himp)
+    title('0-170 HZ');
+    % Step response of digital filter
+    figure(204)
+    set(figure(204), 'name', 'Step response of IIR filter')
+    subplot(3,3,1);
+    [hstep,tstep] = stepz(sos);
+    hstep = hstep*g; 
+    stem(tstep,hstep);
+    title('0-170 HZ');
+    %gain
+    disp('0-170: ');
     k
-
+    %----------------------------------------------------------------------
     
     Wp= [171 300]/temp; Ws=[121 350]/temp;
     [n,Wn]= buttord(Wp,Ws,4,8);
     [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y3 = filtfilt(sos,g,X);
-    disp('170-310: ');
+    % poles and zeros of IIR
+    figure(102);
     subplot(3,3,2);
-    zplane(z,p); title('PZ IIR 170-310');
+    zplane(z,p); title('170-310 Hz');
+    % phase of IIR filter
+    figure(202);
+    figure(202);subplot(3,3,2); phasez(sos,512);  title('170-310 Hz');
+    % Impulse response of digital filter
+    figure(203)
+    subplot(3,3,2);
+    [himp,timp] = impz(sos); himp = himp*g; stem(timp,himp)
+    title('170-310 HZ');
+    % Step response of digital filter
+    figure(204)
+    subplot(3,3,2);
+    [hstep,tstep] = stepz(sos);
+    hstep = hstep*g;
+    stem(tstep,hstep);
+    title('170-310 HZ');
+    %gain
+    disp('170-310: ');
     k
+    %----------------------------------------------------------------------
     
     Wp= [311 600]/temp; Ws=[261 650]/temp;
     [n,Wn]= buttord(Wp,Ws,4,8);
     [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y4 = filtfilt(sos,g,X);
-    disp('310-600: ');
+    % poles and zeros of IIR
+    figure(102);
     subplot(3,3,3);
-    zplane(z,p); title('PZ IIR 310-600');
+    zplane(z,p); title('310-600 Hz');
+    % phase of IIR filter
+    figure(202);
+    figure(202);subplot(3,3,3); phasez(sos,512);  title('310-600 Hz');
+    % Impulse response of digital filter
+    figure(203)
+    subplot(3,3,3);
+    [himp,timp] = impz(sos); himp = himp*g; stem(timp,himp)
+    title('310-600 Hz');
+    % Step response of digital filter
+    figure(204)
+    subplot(3,3,3);
+    [hstep,tstep] = stepz(sos);
+    hstep = hstep*g;
+    stem(tstep,hstep);
+    title('310-600 Hz');
+    %gain
+    disp('310-600: ');
     k
+    %----------------------------------------------------------------------
     
-    Wp= [601 1000]/temp; Ws=[551 1050]/temp;
+    Wp = [601 1000]/temp; Ws=[551 1050]/temp;
     [n,Wn]= buttord(Wp,Ws,4,8);
     [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y5 = filtfilt(sos,g,X);
-    disp('600-1K: ');
+    % poles and zeros of IIR
+    figure(102);
     subplot(3,3,4);
-    zplane(z,p); title('PZ IIR 600-1K');
+    zplane(z,p); title('600-1K Hz');
+    % phase of IIR filter
+    figure(202);
+    figure(202);subplot(3,3,4); phasez(sos,512);  title('600-1K Hz');
+    % Impulse response of digital filter
+    figure(203)
+    subplot(3,3,4);
+    [himp,timp] = impz(sos); himp = himp*g; stem(timp,himp)
+    title('600-1K Hz');
+    % Step response of digital filter
+    figure(204)
+    subplot(3,3,4);
+    [hstep,tstep] = stepz(sos);
+    hstep = hstep*g;
+    stem(tstep,hstep);
+    title('600-1K Hz');
+    %gain
+    disp('600-1K: ');
     k
+    %----------------------------------------------------------------------
     
-    Wp= [1001 3000]/temp; Ws=[951 3050]/temp;
+    Wp = [1001 3000]/temp; Ws=[951 3050]/temp;
     [n,Wn]= buttord(Wp,Ws,4,8);
     [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y6 = filtfilt(sos,g,X);
-    disp('1K-3K: ');
+    % poles and zeros of IIR
+    figure(102);
     subplot(3,3,5);
-    zplane(z,p); title('PZ IIR 1K-3K');
+    zplane(z,p); title('1K-3K Hz');
+    % phase of IIR filter
+    figure(202);
+    figure(202);subplot(3,3,5); phasez(sos,512);  title('1K-3K Hz');
+    % Impulse response of digital filter
+    figure(203)
+    subplot(3,3,5);
+    [himp,timp] = impz(sos); himp = himp*g; stem(timp,himp)
+    title('1K-3K Hz');
+    % Step response of digital filter
+    figure(204)
+    subplot(3,3,5);
+    [hstep,tstep] = stepz(sos);
+    hstep = hstep*g;
+    stem(tstep,hstep);
+    title('1K-3K Hz');
+    %gain
+    disp('1K-3K: ');
     k
+    %----------------------------------------------------------------------
     
     Wp= [3001 6000]/temp; Ws=[2951 6050]/temp;
     [n,Wn]= buttord(Wp,Ws,4,8);
     [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y7 = filtfilt(sos,g,X);
-    disp('3K-6K: ');
+    % poles and zeros of IIR
+    figure(102);
     subplot(3,3,6);
-    zplane(z,p); title('PZ IIR 3K-6K');
+    zplane(z,p); title('3K-6K Hz');
+    % phase of IIR filter
+    figure(202);
+    figure(202);subplot(3,3,6); phasez(sos,512);  title('3K-6K Hz');
+    % Impulse response of digital filter
+    figure(203)
+    subplot(3,3,6);
+    [himp,timp] = impz(sos); himp = himp*g; stem(timp,himp)
+    title('3K-6K Hz');
+    % Step response of digital filter
+    figure(204)
+    subplot(3,3,6);
+    [hstep,tstep] = stepz(sos);
+    hstep = hstep*g;
+    stem(tstep,hstep);
+    title('3K-6K Hz');
+    %gain
+    disp('3K-6K: ');
     k
+    %----------------------------------------------------------------------
     
     Wp= [6001 12000]/temp; Ws=[5950 12050]/temp;
     [n,Wn]= buttord(Wp,Ws,4,8);
     [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y8 = filtfilt(sos,g,X);
-    disp('6K-12K:');
+    % poles and zeros of IIR
+    figure(102);
     subplot(3,3,7);
-    zplane(z,p); title ('PZ IIR 6K-12K');
+    zplane(z,p); title ('6K-12K Hz');
+    % phase of IIR filter
+   %[a,b]=zp2tf(z,p,k);
+    figure(202);subplot(3,3,7); phasez(sos,512);  title('6K-12K Hz');
+    % Impulse response of digital filter
+    figure(203)
+    subplot(3,3,7);
+    [himp,timp] = impz(sos); himp = himp*g; stem(timp,himp)
+    title('6K-12K Hz');
+    % Step response of digital filter
+    figure(204)
+    subplot(3,3,7);
+    [hstep,tstep] = stepz(sos);
+    hstep = hstep*g;
+    stem(tstep,hstep);
+    title('6K-12K Hz');
+    %gain
+    disp('6K-12K:');
     k
+    %----------------------------------------------------------------------
     
     Wp= [12001 14000]/temp; Ws=[11950 14050]/temp;
     [n,Wn]= buttord(Wp,Ws,4,8);
     [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y9 = filtfilt(sos,g,X);
-    disp('12K-14K:');
+    % poles and zeros of IIR
+    figure(102);
     subplot(3,3,8);
-    zplane(z,p); title ('PZ IIR 12K-14K');
+    zplane(z,p); title ('12K-14K Hz');
+    % phase of IIR filter
+    figure(202);
+    figure(202);subplot(3,3,8); phasez(sos,512);  title('12K-14K Hz');
+    % Impulse response of digital filter
+    figure(203)
+    subplot(3,3,8);
+    [himp,timp] = impz(sos); himp = himp*g; stem(timp,himp)
+    title('12K-14K Hz');
+    % Step response of digital filter
+    figure(204)
+    subplot(3,3,8);
+    [hstep,tstep] = stepz(sos);
+    hstep = hstep*g;
+    stem(tstep,hstep);
+    title('12K-14K Hz');
+    %gain
+    disp('12K-14K:');
     k
+    %----------------------------------------------------------------------
     
     Wp= [14001 16000]/temp; Ws=[13950 16050]/temp;
     [n,Wn]= buttord(Wp,Ws,4,8);
     [z,p,k] = butter(n,Wn, 'bandpass');
     [sos,g] = zp2sos(z,p,k);
     y10 = filtfilt(sos,g,X);
-    disp('14K-16K:');
+    % poles and zeros of IIR
+    figure(102);
     subplot(3,3,9);
-    zplane(z,p); title ('PZ IIR 14k-16K');
+    zplane(z,p); title ('14k-16K Hz');
+    % phase of IIR filter
+    figure(202);subplot(3,3,9); phasez(sos,512);  title('14K-16K Hz');
+    % Impulse response of digital filter
+    figure(203)
+    subplot(3,3,9);
+    [himp,timp] = impz(sos); himp = himp*g; stem(timp,himp)
+    title('14K-16K Hz');
+    % Step response of digital filter
+    figure(204)
+    subplot(3,3,9);
+    [hstep,tstep] = stepz(sos);
+    hstep = hstep*g;
+    stem(tstep,hstep);
+    title('14K-16K Hz');
+    %gain
+    disp('14K-16K:');
     k
+    %----------------------------------------------------------------------
 
 end
 disp('make_filters is done');
@@ -418,7 +782,6 @@ end
 
 player = audioplayer(y, new_Fs);
 disp('output_signal is done');
-
 
 
 function update_Fs()
@@ -467,9 +830,6 @@ function stop_btn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global player;
 stop(player) % stop variabel player
-
-
-
 
 
 
@@ -656,7 +1016,6 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
-
 % --- Executes on slider movement.
 function slider9_Callback(hObject, eventdata, handles)
 % hObject    handle to slider9 (see GCBO)
@@ -679,13 +1038,6 @@ function slider9_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-
-
-
-
-
-
-
 
 function edit1_box_Callback(hObject, eventdata, handles)
 % hObject    handle to edit1_box (see GCBO)
@@ -957,8 +1309,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit0_filename_place_Callback(hObject, eventdata, handles)
 % hObject    handle to edit0_filename_place (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -980,20 +1330,17 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-
 % --- Executes on button press in input_plot_btn.
 function input_plot_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to input_plot_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global X;
+global Fs;
+global info;
+t = linspace(0,info.TotalSamples/Fs,length(X));
 axes(handles.input_axes);
-plot(X)
-xlabel('Time')
-ylabel('Audio Signal')
-
-
+plot(t,X);
 
 
 % --- Executes on button press in output_plot_btn.
@@ -1002,19 +1349,11 @@ function output_plot_btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global y;
+global new_Fs;
+global info;
+t = linspace(0,info.TotalSamples/new_Fs,length(y));
 axes(handles.output_axes);
-plot(y)
-xlabel('Time')
-ylabel('Audio Signal')
-
-
-
-
-
-
-
-
-
+plot(t,y);
 
 
 % --- Executes when gui_window is resized.
@@ -1046,7 +1385,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 %}
-
 
 % --- Executes when user attempts to close gui_window.
 function gui_window_CloseRequestFcn(hObject, eventdata, handles)
@@ -1116,7 +1454,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in fir_btn.
 function fir_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to fir_btn (see GCBO)
@@ -1124,14 +1461,12 @@ function fir_btn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 % Hint: get(hObject,'Value') returns toggle state of fir_btn
 
-
 % --- Executes on button press in iir_btn.
 function iir_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to iir_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % Hint: get(hObject,'Value') returns toggle state of iir_btn
-
 
 % --- Executes during object creation, after setting all properties.
 function fir_btn_CreateFcn(hObject, eventdata, handles)
@@ -1163,9 +1498,8 @@ end
 make_filters()
 output_signal()
 
-    
 
-% --- Executes on button press in save_btn.
+    % --- Executes on button press in save_btn.
 function save_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to save_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1176,112 +1510,270 @@ audiowrite('output.wav',y,new_Fs);
 %mp3write(y,new_Fs,'output.mp3');
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-% --- Executes on button press in plot1_filters_btn.
-function plot1_filters_btn_Callback(hObject, eventdata, handles)
-% hObject    handle to plot1_filters_btn (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-global y2; 
-global y3;
-global y4; 
-global y5;
-global y6;
-global y7;
-global y8;
-global y9;
-global y10;
-figure(1);
-subplot(4,5,1)
-plot(y2)
-subplot(4,5,2)
-plot(y3)
-subplot(4,5,3)
-plot(y2)
-subplot(4,5,4)
-plot(y2)
-subplot(4,5,5)
-plot(y2)
-subplot(4,5,6)
-plot(y2)
-subplot(4,5,7)
-plot(y2)
-subplot(4,5,8)
-plot(y2)
-subplot(4,5,9)
-plot(y2)
-subplot(4,5,10)
-plot(y2)
-subplot(4,5,11)
-plot(y2)
-subplot(4,5,12)
-plot(y2)
-subplot(4,5,13)
-plot(y2)
-subplot(4,5,14)
-plot(y2)
-subplot(4,5,15)
-plot(y2)
-subplot(4,5,16)
-plot(y2)
-subplot(4,5,17)
-plot(y2)
-subplot(4,5,18)
-plot(y2)
-
-
-
 % --- Executes on button press in plot2_filters_btn.
 function plot2_filters_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to plot2_filters_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+%Filter 1 try
+global y2;
+global y3;
+global y4;
+global y5;
+global y6;
+global y7;
+global y8;
+global y9;
+global y10;
 
 
-% --- Executes on button press in plot3_filters_btn.
+%Filter Y2,Y3,Y4 plot
+figure(1);
+plot_signal_freqdomain(y2,y3,y4,'0~170 HZ','170~310 HZ','310~600 HZ');
+set(figure(1),'name','Y2,Y3,Y4');
+
+%Filter Y5,Y6,Y7 plot
+figure(2);
+plot_signal_freqdomain(y5,y6,y7, '600~1000 HZ','1000~3000 HZ','3000~6000 HZ');
+set(figure(2),'name','Y5,Y6,Y7');
+
+%Filter Y8,Y9,Y10 plot
+figure(3);
+plot_signal_freqdomain(y8,y9,y10,'6000~12000 HZ','12000~14000 HZ','14000~16000 HZ');
+set(figure(3),'name','Y8,Y9,Y10');
+
+
 function plot3_filters_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to plot3_filters_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global y;
+global y2;
+global y3;
+global y4;
+global y5;
+global y6;
+global y7;
+global y8;
+global y9;
+global y10;
+
+figure(1);
+plot_signal_timedomain(y,y2,y3,y4,y5,y6,y7,y8,y9,y10);
+set(figure(1),'name','Time Domain');
 
 
-% --- Executes on button press in plot4_filters_btn.
-function plot4_filters_btn_Callback(hObject, eventdata, handles)
-% hObject    handle to plot4_filters_btn (see GCBO)
+%Function Draws Frequency Responce of filters signals
+function plot_signal_freqdomain(y1, y2, y3, band1, band2, band3)
+global info;
+global new_Fs;
+
+%Y1 signal magnitude and phase
+%Magnitude
+t = linspace(0,info.TotalSamples,length(y1));
+Fvec = linspace(-new_Fs/2,new_Fs/2,length(t));
+y2plot = fftshift(fft(y1));
+subplot(2,3,1);
+plot(Fvec,abs(y2plot));
+grid;
+title(band1);
+xlabel('Frequency (Hz)');
+ylabel('Amplitude');
+
+
+%Phase
+subplot(2,3,4);
+plot(Fvec,angle(y2plot));
+grid;
+title('Phase spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Angle');
+xlim([-3,3]);
+
+%Y2 signal magnitude and phase
+%Magnitude
+t = linspace(0,info.TotalSamples,length(y2));
+Fvec = linspace(-new_Fs/2,new_Fs/2,length(t));
+y2plot = fftshift(fft(y2));
+subplot(2,3,2);
+plot(Fvec,abs(y2plot));
+grid;
+title(band2);
+xlabel('Frequency (Hz)');
+ylabel('Amplitude');
+
+
+%Phase
+subplot(2,3,5);
+plot(Fvec,angle(y2plot));
+grid;
+title('Phase spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Angle');
+xlim([-3,3]);
+
+
+%Y3 signal magnitude and phase
+%Magnitude
+t = linspace(0,info.TotalSamples,length(y3));
+Fvec = linspace(-new_Fs/2,new_Fs/2,length(t));
+y2plot = fftshift(fft(y3));
+subplot(2,3,3);
+plot(Fvec,abs(y2plot));
+grid;
+title(band3);
+xlabel('Frequency (Hz)');
+ylabel('Amplitude');
+
+
+%Phase
+subplot(2,3,6);
+plot(Fvec,angle(y2plot));
+grid;
+title('Phase spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Angle');
+xlim([-3,3]);
+
+% Function to draw the time domain of filters signals
+function plot_signal_timedomain(y,y1,y2,y3,y4,y5,y6,y7,y8,y9)
+global info;
+global new_Fs;
+t = linspace(0,info.TotalSamples/new_Fs,length(y));
+%Y1 :0~170 HZ
+subplot(3,3,1);
+plot(t,y1);
+grid;
+title('0~170 HZ');
+xlabel('t');
+ylabel('y(t)');
+
+%Y2 :171~310 HZ
+subplot(3,3,2);
+plot(t,y2);
+grid;
+title('170~310 HZ');
+xlabel('t');
+ylabel('y(t)');
+
+%Y3 :311~600 HZ
+subplot(3,3,3);
+plot(t,y3);
+grid;
+title('310~600 HZ');
+xlabel('t');
+ylabel('y(t)');
+
+%Y4 :601~1000 HZ
+subplot(3,3,4);
+plot(t,y4);
+grid;
+title('600~1000 HZ');
+xlabel('t');
+ylabel('y(t)');
+
+%Y5 :1001~3000 HZ
+subplot(3,3,5);
+plot(t,y5);
+grid;
+title('1000~3000 HZ');
+xlabel('t');
+ylabel('y(t)');
+
+%Y6 :3001~6000 HZ
+subplot(3,3,6);
+plot(t,y6);
+grid;
+title('3000~6000 HZ');
+xlabel('t');
+ylabel('y(t)');
+
+%Y7 :6001~12000 HZ
+subplot(3,3,7);
+plot(t,y7);
+grid;
+title('6000~12000 HZ');
+xlabel('t');
+ylabel('y(t)');
+
+%Y8 :12001~14000 HZ
+subplot(3,3,8);
+plot(t,y8);
+grid;
+title('12000~14000 HZ');
+xlabel('t');
+ylabel('y(t)');
+
+%Y9 :14001~16000 HZ
+subplot(3,3,9);
+plot(t,y9);
+grid;
+title('14000~16000 HZ');
+xlabel('t');
+ylabel('y(t)');
+
+
+function plot_io_signals()
+global info;
+global new_Fs;
+global Fs;
+global X;
+global y;
+%INPUT
+%Magnitude
+t = linspace(0,info.TotalSamples,length(X));
+Fvec = linspace(-Fs/2,Fs/2,length(t));
+Signalplot = fftshift(fft(X));
+subplot(2,2,1);
+plot(Fvec,abs(Signalplot));
+grid;
+title('Input Signal Magnitude');
+xlabel('Frequency (Hz)');
+ylabel('Amplitude');
+
+
+%Phase
+subplot(2,2,3);
+plot(Fvec,angle(Signalplot));
+grid;
+title('Phase spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Angle');
+xlim([-3,3]);
+
+%Output
+%Magnitude
+t = linspace(0,info.TotalSamples,length(y));
+Fvec = linspace(-new_Fs/2,new_Fs/2,length(t));
+Signalplot = fftshift(fft(y));
+subplot(2,2,2);
+plot(Fvec,abs(Signalplot));
+grid;
+title('Output Signal Magnitude');
+xlabel('Frequency (Hz)');
+ylabel('Amplitude');
+
+
+%Phase
+subplot(2,2,4);
+plot(Fvec,angle(Signalplot));
+grid;
+title('Phase spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Angle');
+xlim([-3,3]);
+
+
+
+% --- Executes on button press in in_out_btn.
+function in_out_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to in_out_btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global y2;    
-
-
-
+figure(10);
+set(figure(10),'name','Input - Output signals');
+plot_io_signals();
 
 
